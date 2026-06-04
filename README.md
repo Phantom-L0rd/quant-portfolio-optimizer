@@ -32,7 +32,7 @@ To simulate black-swan events and market crashes, the engine implements the **Me
 $$dS = \mu S dt + \sigma S dW + S(e^J - 1) dN$$
 Where $dN$ is a Poisson process dictating crash frequency ($\lambda$) and $J$ dictates average crash severity.
 
-## 🛠️ Tech Stack
+## Tech Stack
 * **Language:** Python
 * **Data Engineering:** SQL (SQLite), Pandas, yfinance
 * **Mathematics & Optimization:** NumPy, SciPy
