@@ -1,59 +1,168 @@
-# Stochastic Portfolio Optimizer & Crash Stress-Tester
+# 📈 Stochastic Portfolio Optimizer & Market Stress-Tester
 
-A quantitative financial engineering dashboard built with Python and Streamlit. This application applies computational physics principles—specifically Geometric Brownian Motion and the Merton Jump-Diffusion model—to optimize asset allocation and stress-test portfolios against sudden market crashes.
+> A quantitative finance tool bridging computational physics and portfolio theory.
+> Simulates portfolio performance using Monte Carlo methods, optimises asset allocation
+> via the Efficient Frontier, and stress-tests against market crashes using the
+> Merton Jump-Diffusion model.
 
-## Overview
-Asset managers and quantitative analysts rely heavily on stochastic modeling to understand risk. This project bridges data engineering, modern portfolio theory, and advanced mathematical analysis to provide a full-stack risk assessment tool. It ingests historical market data, calculates the Efficient Frontier, and runs Monte Carlo simulations to project long-term Value at Risk (VaR).
+[![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live_Demo-FF4B4B?logo=streamlit)](https://your-app-link.streamlit.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Interactive Dashboard Features
+---
 
-* **Portfolio Overview:** Visualizes current asset weights, historical cumulative returns, and summary statistics including mean return, volatility, and individual asset Sharpe ratios.
-* **The Efficient Frontier:** An interactive scatter plot of thousands of simulated portfolios. It highlights the Max Sharpe Ratio and Minimum Volatility portfolios, plotting the current allocation directly on the curve.
-* **Monte Carlo Projections:** A fan chart displaying 1,000 simulated portfolio paths over a selected multi-year horizon, highlighting the 5th, 50th, and 95th percentile bands alongside a Value at Risk (VaR) distribution histogram.
-* **Crash Stress-Testing:** A side-by-side comparative analysis of a normal market projection versus a sudden crash scenario, calculating the exact probability of severe loss using jump-diffusion mechanics.
+## Live Demo
 
-## The Quantitative Engine
+🚀 **[Launch App →](https://your-app-link.streamlit.app)**
 
-This application relies on a robust mathematical backend to simulate market realities.
+---
 
-### Log Returns & Diversification
-Raw adjusted close prices are converted to time-additive, symmetric log returns using $r_t = \ln(P_t / P_{t-1})$. The optimizer calculates portfolio variance using the covariance matrix $\Sigma$, capturing the correlation between assets. Portfolio volatility is defined as:
-$$\sigma_p = \sqrt{w^T \Sigma w}$$
+## What It Does
 
-### Objective Function
-The Scipy optimization engine seeks the weight vector $w$ that maximizes the Sharpe Ratio, utilizing the South African 10-year government bond yield as the baseline risk-free rate ($r_f$):
-$$S = \frac{E[R_p] - r_f}{\sigma_p}$$
+Most retail investors pick stocks based on gut feel. This tool replaces that with
+quantitative analysis — pulling historical price data for a basket of JSE and global
+assets, computing optimal portfolio weights, and simulating thousands of possible futures
+to quantify both upside potential and crash risk.
 
-### Stochastic Differential Equations (SDE)
-Future portfolio states are simulated using Geometric Brownian Motion (GBM) for normal market drift and continuous diffusion:
-$$dS = \mu S dt + \sigma S dW$$
+| Feature | Description |
+|---|---|
+| **Efficient Frontier** | Simulates 5,000 random weight combinations to find the Max-Sharpe and Min-Volatility portfolios |
+| **Monte Carlo Projections** | Projects portfolio value over 1–30 years using Geometric Brownian Motion across up to 5,000 paths |
+| **Merton Jump-Diffusion** | Extends GBM with a compound Poisson process to model sudden market crashes |
+| **Value at Risk (VaR)** | Computes the loss threshold exceeded with 5% probability over the investment horizon |
+| **SQL Data Pipeline** | Fetches from Yahoo Finance, stores in SQLite using `LAG()` window functions for return computation |
 
-To simulate black-swan events and market crashes, the engine implements the **Merton Jump-Diffusion Model**, injecting a compound Poisson jump process into the SDE:
-$$dS = \mu S dt + \sigma S dW + S(e^J - 1) dN$$
-Where $dN$ is a Poisson process dictating crash frequency ($\lambda$) and $J$ dictates average crash severity.
+---
+
+## Screenshots
+
+<!-- Add screenshots after deployment -->
+> _Dashboard screenshots coming after deployment_
+
+---
 
 ## Tech Stack
-* **Language:** Python
-* **Data Engineering:** SQL (SQLite), Pandas, yfinance
-* **Mathematics & Optimization:** NumPy, SciPy
-* **Frontend UI:** Streamlit
-* **Visualization:** Plotly / D3.js
 
-## Local Installation & Execution
+| Layer | Tools |
+|---|---|
+| Language | Python 3.10+ |
+| Data | `yfinance`, `SQLite`, `pandas` |
+| Analytics | `NumPy`, `SciPy` |
+| Visualisation | `Plotly`, `Streamlit` |
+| Database | SQLite with SQL window functions (`LAG`, `PARTITION BY`) |
 
-Clone the repository and install the required dependencies to run the simulation locally.
+---
+
+## Asset Universe
+
+The app covers 10 assets across JSE and global markets:
+
+**JSE (ZAR):** Naspers (NPN.JO), Sasol (SOL.JO), Standard Bank (SBK.JO), Shoprite (SHP.JO), MTN (MTN.JO)
+
+**Global ETFs (USD):** S&P 500 (SPY), Nasdaq 100 (QQQ), Gold (GLD), Emerging Markets (EEM), US 20Y Bonds (TLT)
+
+> **Note on currency:** JSE tickers are ZAR-denominated, global ETFs are USD-denominated.
+> The model uses relative log returns, which are comparable across currencies for
+> covariance and weight optimisation purposes. Absolute return comparisons should
+> account for the ZAR/USD exchange rate.
+
+---
+
+## Project Structure
+
+```
+quant-portfolio-optimizer/
+├── src/
+│   ├── data_pipeline.py    # yfinance fetch → SQLite storage + LAG() queries
+│   ├── analytics.py        # portfolio return, volatility, Sharpe ratio
+│   ├── optimization.py     # Efficient Frontier via Monte Carlo weight simulation
+│   └── monte_carlo.py      # GBM and Merton Jump-Diffusion simulation
+├── app.py                  # Streamlit multi-tab dashboard
+├── MATH_AND_METHODOLOGY.md # Full mathematical derivations
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## The Models
+
+### Geometric Brownian Motion (GBM)
+Standard continuous-time model for asset prices. The log-price follows:
+
+```
+S(t+dt) = S(t) · exp( (μ - σ²/2)·dt + σ·√dt·Z ),  Z ~ N(0,1)
+```
+
+The `σ²/2` term is the Itô correction, ensuring E[S(t)] grows at rate μ.
+
+### Merton Jump-Diffusion
+Extends GBM with a compound Poisson process to model sudden market crashes:
+
+```
+dS = μS dt + σS dW + S(e^J - 1) dN
+```
+
+Where `N ~ Poisson(λ·dt)` counts crash events and `J ~ N(μ_J, σ_J²)` is the log jump size.
+The drift is compensated by `-λk` (where `k = E[e^J - 1]`) to preserve the expected return.
+
+See [MATH_AND_METHODOLOGY.md](MATH_AND_METHODOLOGY.md) for full derivations.
+
+---
+
+## Installation
 
 ```bash
-# 1. Clone the repository
-git clone [https://github.com/yourusername/quant-portfolio-optimizer.git](https://github.com/yourusername/quant-portfolio-optimizer.git)
+git clone https://github.com/Phantom-L0rd/quant-portfolio-optimizer.git
 cd quant-portfolio-optimizer
-
-# 2. Install dependencies
 pip install -r requirements.txt
-
-# 3. Build the local SQLite database (Fetches historical data)
-python scripts/build_db.py
-
-# 4. Launch the Streamlit application
 streamlit run app.py
 ```
+
+---
+
+## How the SQL Pipeline Works
+
+Rather than computing returns purely in Python, this project uses SQLite's `LAG()` window
+function to compute daily returns directly in the database:
+
+```sql
+WITH lagged AS (
+    SELECT ticker, date, adj_close,
+           LAG(adj_close) OVER (PARTITION BY ticker ORDER BY date) AS prev_close
+    FROM prices
+    WHERE ticker IN (...)
+      AND date BETWEEN ? AND ?
+)
+SELECT ticker, date,
+       LOG(adj_close / prev_close) AS log_return
+FROM lagged
+WHERE prev_close IS NOT NULL;
+```
+
+`LOG()` is registered as a Python UDF since SQLite has no built-in logarithm function,
+demonstrating Python ↔ SQL integration.
+
+---
+
+## Limitations & Future Work
+
+- **Currency mixing:** JSE (ZAR) and global (USD) assets are treated as same-currency.
+  A production version would apply a ZAR/USD exchange rate adjustment.
+- **Long-only constraint:** The optimiser uses Dirichlet-sampled weights (no short selling).
+  Future work: add scipy.optimize for exact frontier computation with short constraints.
+- **Static parameters:** μ and σ are estimated from historical data and assumed constant.
+  Future work: GARCH model for time-varying volatility.
+- **No transaction costs:** Real portfolio rebalancing incurs brokerage fees not modelled here.
+
+---
+
+## References
+
+- Merton, R.C. (1976). Option pricing when underlying stock returns are discontinuous. *Journal of Financial Economics*, 3(1–2), 125–144.
+- Markowitz, H. (1952). Portfolio Selection. *The Journal of Finance*, 7(1), 77–91.
+- Black, F. & Scholes, M. (1973). The Pricing of Options and Corporate Liabilities. *Journal of Political Economy*, 81(3), 637–654.
+
+---
+
+*Built by [Arop Kuol](https://github.com/Phantom-L0rd) · BSc Physical Sciences, SMU Pretoria*
