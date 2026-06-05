@@ -6,14 +6,14 @@
 > Merton Jump-Diffusion model.
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Live_Demo-FF4B4B?logo=streamlit)](https://your-app-link.streamlit.app)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live_Demo-FF4B4B?logo=streamlit)](https://phantom-portfolio-optimizer.streamlit.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
 ## Live Demo
 
-🚀 **[Launch App →](https://your-app-link.streamlit.app)**
+🚀 **[Launch App →](https://phantom-portfolio-optimizer.streamlit.app/)**
 
 ---
 
